@@ -22,6 +22,18 @@ socket.on('newMessage', function (message) {
     $('#messages').append(li);
 });
 
+socket.on('newLocationMessage', function (message) {
+    var li = $('<li></li>');
+    var a = $('<a target="_blank">View location</a>')
+
+    // safe method to prevent XSS attacks
+    li.text(`${message.from}: `);
+    a.attr('href', message.url);
+    li.append(a);
+
+    $('#messages').append(li);
+})
+
 $('#message-form').on('submit', function (e) {
     // prevent page from refreshing on submit
     e.preventDefault();
@@ -34,4 +46,20 @@ $('#message-form').on('submit', function (e) {
     });
 
     $('#message-field').val('');
+});
+
+var locationButton = $('#send-location');
+locationButton.on('click', function () {
+    if (!navigator.geolocation) {
+        return alert('Geolocation not supported by your browser');
+    }
+
+    navigator.geolocation.getCurrentPosition(function (position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+
+        socket.emit('createLocationMessage', {lat, lng});
+    }, function () {
+        alert('Location not found');
+    });
 });
