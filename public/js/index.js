@@ -38,14 +38,15 @@ $('#message-form').on('submit', function (e) {
     // prevent page from refreshing on submit
     e.preventDefault();
 
+    var input = $('#message-field');
+
     socket.emit('createMessage', {
         from: 'User',
-        text: $('[name=message]').val()
+        text: input.val()
     }, function () {
-        //
+        input.val('');
     });
 
-    $('#message-field').val('');
 });
 
 var locationButton = $('#send-location');
@@ -54,11 +55,17 @@ locationButton.on('click', function () {
         return alert('Geolocation not supported by your browser');
     }
 
+    locationButton.attr('disabled', 'disabled');
+    locationButton.text('Sending location...')
+
     navigator.geolocation.getCurrentPosition(function (position) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
 
         socket.emit('createLocationMessage', {lat, lng});
+
+        locationButton.removeAttr('disabled');
+        locationButton.text('Send location');
     }, function () {
         alert('Location not found');
     });
