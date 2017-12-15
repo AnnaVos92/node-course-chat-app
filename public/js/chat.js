@@ -15,6 +15,8 @@ function scrollToBottom() {
     if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
         console.log('should scroll');
         messages.scrollTop(scrollHeight);
+    } else if (newMessage.prev().length != 0) {
+        console.log('new message below');
     }
 }
 
